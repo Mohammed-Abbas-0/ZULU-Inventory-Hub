@@ -1,0 +1,243 @@
+﻿
+@model InventoryHubUI.Models.Product
+
+<link href="~/css/CreateProduct.css" rel="stylesheet" />
+<link href="~/css/SelectDesign.css" rel="stylesheet" />
+
+
+<div style="display:flex;align-items:center;padding:10px 15px;">
+    <h2>@ViewData["Title"]</h2>
+</div>
+<form method="post" enctype="multipart/form-data" style="padding:0 17px;">
+    <section class="row" style="padding:15px;">
+        <div class="col-md-8" style="background-color:#ffffff;height:80%;padding:16px 19px;border-radius:10px;">
+            <div class="form-group">
+                <label asp-for="Name">Prdouct Name <span class="span-wraning">*</span></label>
+                <input asp-for="Name" placeholder="Enter Product Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Code">Code <span class="span-wraning">*</span></label>
+                <input asp-for="Code" placeholder="Product Code" class="form-control" />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description">Description</label>
+                <textarea asp-for="Description" placeholder="Description" class="form-control" style="height:200px;width:100%;resize:none;"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <h3>Stock & Pricing</h3>
+            <div style="display:flex; justify-content:flex-start;">
+
+                <div class="form-group" style="flex:1">
+                    <label asp-for="Price">Price <span class="span-wraning">*</span></label>
+                    <input asp-for="Price" placeholder="Enter Price" class="form-control" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" style="flex:1">
+                    <label asp-for="StockQuantity">StockQuantity <span class="span-wraning">*</span></label>
+                    <input asp-for="StockQuantity" placeholder="Enter Stock Quantity" class="form-control" />
+                    <span asp-validation-for="StockQuantity" class="text-danger"></span>
+                </div>
+            </div>
+            <div style="display:flex;">
+                <div class="form-group" style="flex:1;margin-right:4px;">
+                    <label asp-for="CategoryId">Category <span class="span-wraning">*</span></label>
+                    <select asp-for="CategoryId" class="form-control select-category-option" asp-items="ViewBag.CategoryList">
+                        <option value="">-- Select Category --</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label asp-for="StoreId">Store <span class="span-wraning">*</span></label>
+                    <select asp-for="StoreId" class="form-control select-store-option" asp-items="ViewBag.StoreList">
+                        <option value="">-- Select Store --</option>
+                    </select>
+                    <span asp-validation-for="StoreId" class="text-danger"></span>
+
+                </div>
+            </div>
+            <div style="display:flex; justify-content:flex-start;">
+                <div>
+                    <button id="submit-product" type="submit" class="btn " style="margin: 0 5px; background-color: #438a7a;color:#ffffff; ">Create Product</button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-secondary" id="clear-form">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-3 Image-Area" style=" height: auto; border-radius:5px;padding:12px 10px;">
+            <div class="image-upload-container">
+                <div>
+                    <input asp-for="ImagePath" id="file-input" type="file" class="file-input" accept="image/*" />
+                    <div class="upload-message">
+                        <i class="fas fa-upload"></i> <!-- أيقونة رفع الصورة -->
+                        <p style="font-size:19px;">Upload your product image.</p>
+                        <p style="font-weight:300"><br>Only PNG, JPG format allowed.<br>500x500 pixels are recommended.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </section>
+
+</form>
+
+
+
+<!-- Include validation scripts -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/spin.js@2.3.2/spin.min.js"></script>
+    <script>
+        
+
+        document.querySelector('.image-upload-container').addEventListener('click', function () {
+            document.getElementById('file-input').click();
+        });
+        // عندما يختار المستخدم صورة جديدة
+        document.getElementById('file-input').addEventListener('change', function () {
+            var file = this.files[0];
+
+            if (file) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    // عرض الصورة كخلفية
+                    document.querySelector('.image-upload-container').style.backgroundImage = 'url(' + e.target.result + ')';
+                    //$(".image-upload-container").addClass("image-background");
+                    $(".upload-message").addClass("d-none"); // إخفاء نص "Upload your product image"
+                };
+
+                reader.readAsDataURL(file);
+
+
+            }
+        });
+
+
+        $(document).ready(function () {
+            $("#submit-product").on('click', function (e) {
+                e.preventDefault();
+                if (!$('form').valid()) {
+                    toastr.info('Please fill in all required fields.', 'Validation Error');
+                    return;
+                }
+                var formData = new FormData();
+                formData.append("Name", $("#Name").val());
+                formData.append("Code", $("#Code").val());
+                formData.append("Description", $("#Description").val());
+                formData.append("StockQuantity", $("#StockQuantity").val());
+                formData.append("Price", $("#Price").val());
+                var categoryId = $("#CategoryId").val();
+
+                // التأكد من أن التصنيف تم اختياره
+                if (!categoryId) {
+                    toastr.error("Please select a category.", 'info');
+                    return;
+                }
+                formData.append("CategoryId", categoryId);
+                var storeId = $("#StoreId").val();
+
+                // التأكد من أن التصنيف تم اختياره
+                if (!storeId) {
+                    toastr.error("Please select a Store.", 'info');
+                    return;
+                }
+                formData.append("StoreId", storeId);
+
+                var fileInput = document.getElementById('file-input');
+                if (fileInput.files.length > 0) {
+                    formData.append("imagePath", fileInput.files[0]);
+                } else {
+                    toastr.error("Please select a Product Image.", 'info');
+                    return;
+                }
+                var spinner = new Spinner().spin();
+                document.body.appendChild(spinner.el);
+                spinner.spin(document.body);
+
+                $.ajax({
+                    url: '@Url.Action("CreateProduct", "Products")',
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+
+                        if (response.success == "true") {
+                            $("#ProductId").val('');
+                            $("#Name").val('');
+                            $("#Description").val('');
+                            $("#Code").val('');
+                            $("#Price").val(0);
+                            $("#StockQuantity").val(0);
+                            $('.select-category-option').val('').trigger('change');
+                            $('.select-store-option').val('').trigger('change');
+                            $('.image-upload-container').css('background-image', 'none');
+                            $('#file-input').val('');
+                            $(".upload-message").removeClass("d-none"); // إخفاء نص "Upload your product image"
+                            toastr.success(response.message, 'Sucesss');
+                            spinner.stop();
+                        } else {
+
+                            toastr.error(response.message, 'Error');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        toastr.error("Failed to add the product.", 'Error');
+                    }
+                });
+                
+            });
+        });
+        var opts = {
+            animation: 'spinner-line-fade-quick', // The CSS animation name for the lines
+           
+        }
+        // Clear Item
+        $("#clear-form").on("click", function () {
+
+            $("#ProductId").val('');
+            $("#Name").val('');
+            $("#Description").val('');
+            $("#Code").val('');
+            $("#Price").val(0);
+            $('#file-input').val('');
+            $("#StockQuantity").val(0);
+            $('.select-category-option').val('').trigger('change');
+            $('.select-store-option').val('').trigger('change');
+            $('.image-upload-container').css('background-image', 'none');
+            $(".upload-message").removeClass("d-none");
+        })
+
+    </script>
+
+
+    <script>
+        // تفعيل Select2 على قائمة التصنيفات
+        $(document).ready(function () {
+            $('.select-category-option').select2({
+                placeholder: "Search for a category", // نص يظهر كعنصر placeholder
+                allowClear: true, // للسماح بإزالة الاختيار
+                width: '100%', // لضبط العرض
+                theme: "classic" // يمكنك استخدام ثيم Select2
+            });
+            $('.select-store-option').select2({
+                placeholder: "Search for a Store", // نص يظهر كعنصر placeholder
+                allowClear: true, // للسماح بإزالة الاختيار
+                width: '100%', // لضبط العرض
+                theme: "classic" // يمكنك استخدام ثيم Select2
+            });
+        });
+
+
+    </script>
+}

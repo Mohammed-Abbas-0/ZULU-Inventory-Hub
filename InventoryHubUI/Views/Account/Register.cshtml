@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "Sign Up";
+}
+<!-- عرض رسالة الخطأ إذا كانت موجودة -->
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div class="alert alert-danger" id="errorMessage">
+        @ViewBag.ErrorMessage
+    </div>
+}
+<div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="card p-5" style="width: 500px;">
+        <div class="text-center mb-4">
+            <h2>Sign up</h2>
+            <p>Enter your details below to create your account and get started.</p>
+        </div>
+        <form id="signupForm">
+            <div class="mb-3">
+                <label for="firstname">First Name</label>
+                <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Enter your First name..." required />
+            </div>
+            <div class="mb-3">
+                <label for="lastname">Last Name</label>
+                <input type="text" class="form-control" id="lastname" name="lastname" placeholder="Enter your Last name..." required />
+            </div>
+            <div class="mb-3">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="Email" placeholder="example@gmail.com" required />
+            </div>
+            @*<div class="mb-3">
+            <label for="dob">Date of Birth</label>
+            <input type="date" class="form-control" id="dob" name="DateOfBirth" required />
+        </div>*@
+            <div class="mb-3">
+                <label for="phone">Phone Number</label>
+                <input type="text" class="form-control" id="phone" name="PhoneNumber" placeholder="+45 1344-343" required />
+            </div>
+            <div class="mb-3">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="Password" placeholder="Enter password..." required />
+            </div>
+            <div class="mb-3">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPassword" name="ConfirmPassword" placeholder="Confirm password..." required />
+            </div>
+            <div class="d-flex justify-content-between">
+                <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Confirm</button>
+            </div>
+            <p class="text-center mt-3">
+                Already have an account? <a href="/Account/Login">Login</a>
+            </p>
+        </form>
+        <div id="message" class="alert" style="display:none;"></div>
+
+    </div>
+</div>
+<!-- إضافة سكربت لإخفاء الرسالة بعد 4 ثواني -->
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('#errorMessage').fadeOut('slow');
+            }, 4000); // 4000ms = 4 seconds
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#signupForm').on('submit', function (e) {
+                debugger
+                e.preventDefault();
+
+                $.ajax({
+                    url: '@Url.Action("Register", "Account")',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        var messageBox = $('#message');
+                        if (response.success) {
+                            messageBox.removeClass('alert-danger').addClass('alert-success');
+                        } else {
+                            messageBox.removeClass('alert-success').addClass('alert-danger');
+                        }
+                        messageBox.text(response.message).fadeIn('slow');
+                        setTimeout(function () {
+                            messageBox.fadeOut('slow');
+                        }, 4000); // 4000ms = 4 seconds
+                    },
+                    error: function () {
+                        var messageBox = $('#message');
+                        messageBox.removeClass('alert-success').addClass('alert-danger');
+                        messageBox.text('An error occurred. Please try again.').fadeIn('slow');
+                        setTimeout(function () {
+                            messageBox.fadeOut('slow');
+                        }, 4000); // 4000ms = 4 seconds
+                    }
+                });
+            });
+        });
+    </script>
+}

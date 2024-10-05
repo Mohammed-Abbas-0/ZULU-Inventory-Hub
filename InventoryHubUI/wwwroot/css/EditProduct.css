@@ -1,0 +1,52 @@
+﻿.sectionIcons i{
+    font-size:41px;
+    cursor:pointer;
+}
+    .sectionIcons i:hover {
+        color: #438a7a;
+    }
+
+.layer-image, .layout-visable {
+    position: absolute;
+    top: 0;
+    height: 80%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all .5s;
+    color: #ffffff;
+    text-align: center;
+}
+    .layer-image:hover {
+        cursor: pointer;
+    }
+
+.upload-message {
+    visibility: hidden;
+    z-index:2;
+}
+    .layer-image:hover .upload-message
+    {
+        visibility:visible;
+        
+    }
+
+.layout-visable {
+    background: #121111;
+    opacity: .6;
+    visibility: hidden;
+    transition: all .1s;
+}
+    .Image-Area:hover .layout-visable {
+        visibility: visible;
+    }
+
+
+.image-div {
+    width: 100%; /* عرض الحاوية */
+    height: 100%; /* يمكنك ضبط الارتفاع حسب الحاجة */
+    background-size: cover; /* يضمن أن الصورة تغطي الحاوية بالكامل */
+    background-position: center; /* يضمن أن الصورة تتمركز داخل الحاوية */
+    background-repeat: no-repeat; /* يزيل التكرار إذا كانت الصورة أصغر من الحاوية */
+}

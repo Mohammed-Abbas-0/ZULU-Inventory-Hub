@@ -1,0 +1,175 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+<style>
+    .btn-login {
+        background-color: #438a7a;
+        color: #ffffff;
+    }
+
+        .btn-login:hover {
+            background-color: #397568;
+            color: #ffffff;
+        }
+    .layout {
+        position: absolute;
+        z-index: 6;
+        background: #1f1f1fa6;
+        top: 0;
+        left: 0;
+        height: 580px;
+        width: 100%;
+    }
+    .icon-password {
+        position: absolute;
+        right: 12px;
+        top: 40px;
+        cursor:pointer
+    
+    }
+</style>
+
+
+
+
+<div class="Header" style=" position: absolute; top: 0; width: 100%; text-align: center; padding: 20px 0; left: 0;">
+    <img src="~/svgviewer-output.png" alt="Logo" />
+</div>
+
+<div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+
+    <div style="padding:0; flex:1">
+        <div class="card p-5" style="width: 100%;">
+            <div class="text-center mb-4">
+                <h2>Welcome back</h2>
+                <p>Sign in to continue to Zulu Inventory Hub. 😊</p>
+            </div>
+            <form method="post" action="/Account/Login">
+                <div class="mb-3">
+                    <label for="Email">Email <span style="color:red">*</span></label>
+                    <input type="text" class="form-control" id="email" name="Email" placeholder="Enter Email..." required />
+                </div>
+                <div class="mb-3" style="position:relative">
+                    <label for="password">Password <span style="color:red">*</span></label>
+                    <input type="password" class="form-control" id="password" name="Password" placeholder="Enter password..." required />
+                    <i  id="eye-active" class="icon-password bi bi-eye"></i>
+                    <i id="eye-no-active" class="icon-password bi bi-eye-slash"></i>
+                </div>
+                <div class="mb-3">
+                    <button type="submit" class="btn  btn-block btn-login">LOGIN</button>
+                </div>
+                <p class="text-center">
+                    Don't have an account? <a href="/Account/SignUp">Sign up for Free</a>
+                </p>
+            </form>
+            <div style="position:relative;margin-bottom:17px;">
+                <hr style="border: 1px solid #b5b3b3" />
+                <p style=" position: absolute; top: 5px; left: 165px; background: #ffffff; z-index: 2; width: 140px; text-align: center; color: #8d8383;">Or Sign Up with</p>
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-outline-dark btn-block" style="position: relative; border-radius: 20px; border: 2px solid #c0c0c0;" id="GoogleSignIn">
+                    <svg style="position:absolute;left:12px;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" class="l">
+                        <g id="google">
+                            <g id="google-vector" fill-rule="evenodd" clip-rule="evenodd">
+                                <path id="Shape" fill="#4285F4" d="M20.64 12.205q-.002-.957-.164-1.84H12v3.48h4.844a4.14 4.14 0 0 1-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615"></path>
+                                <path id="Shape_2" fill="#34A853" d="M12 21c2.43 0 4.468-.806 5.957-2.18L15.05 16.56c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H3.958v2.332A9 9 0 0 0 12.001 21"></path>
+                                <path id="Shape_3" fill="#FBBC05" d="M6.964 13.712a5.4 5.4 0 0 1-.282-1.71c0-.593.102-1.17.282-1.71V7.96H3.957A9 9 0 0 0 3 12.002c0 1.452.348 2.827.957 4.042z"></path>
+                                <path id="Shape_4" fill="#EA4335" d="M12 6.58c1.322 0 2.508.455 3.441 1.346l2.582-2.58C16.463 3.892 14.427 3 12 3a9 9 0 0 0-8.043 4.958l3.007 2.332c.708-2.127 2.692-3.71 5.036-3.71"></path>
+                            </g>
+                        </g>
+                    </svg>
+                    Login with Google
+                </button>
+            </div>
+        </div>
+
+    </div>
+    <div style="padding:0; flex:1;position:relative">
+        <div class="card" style="width: 100%; height:580px; position:relative">
+            <div class="layout"></div>
+            <div >
+                <img src="~/Images/AdobeStock_221081758_Preview.jpeg" style="width:100%;height:580px;"/>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@*<div class="col-md-6">
+    <h1>External Login</h1>
+    <hr />
+    @{
+        if (Model.ExternalLogins.Count == 0)
+        {
+            <div>No external logins configured</div>
+        }
+        else
+        {
+            <form method="post" asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
+                <div>
+                    @foreach (var provider in Model.ExternalLogins)
+                    {
+                        <button type="submit" class="btn btn-primary" style="width:auto"
+                                name="provider" value="@provider.Name"
+                                title="Login using your @provider.DisplayName account">
+                            @provider.DisplayName
+                        </button>
+                    }
+                </div>
+            </form>
+        }
+    }
+</div>*@
+
+@section Scripts{ 
+    <script>
+        $(document).ready(function () {
+            $("#eye-active").hide();
+        })
+        $("#eye-no-active").on("click", function () {
+            $(this).hide();
+            $("#eye-active").show();
+            $("#password").attr("type", "text");
+        })
+        $("#eye-active").on("click", function () {
+            $(this).hide();
+            $("#eye-no-active").show();
+            $("#password").attr("type", "password");
+
+        })
+
+
+        @*$("#GoogleSignIn").on("click", function () {
+
+                        $.ajax({
+                            url: '@Url.Action("GoogleSignIn","Account")',
+                            type: 'POST',
+                            contentType: 'application/json',
+
+                            success: function (data) {
+                                //debugger
+                                console.log(data)
+                                //if (data) {
+                                //    sessionStorage.setItem('JWTToken', data.newToken);
+                                //    sessionStorage.setItem('RefreshToken', data.newRefreshToken);
+                                //} else {
+                                //    console.error('Failed to refresh token');
+                                //}
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error refreshing token');
+                            }
+                        });
+        })*@
+
+//   $("#GoogleSignIn").on("click", function () {
+//       window.location.href = 'https://localhost:44324/api/Account/GoogleLogin';
+//});
+
+         document.getElementById('GoogleSignIn').addEventListener('click', function() {
+        window.location.href = '@Url.Action("GoogleSignIn", "Account")';
+    });
+
+
+    </script>
+}

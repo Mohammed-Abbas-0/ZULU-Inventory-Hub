@@ -1,0 +1,37 @@
+﻿
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true" style="top:20%;">
+    <input id="key" value="" hidden/>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">
+
+                </h5>
+            </div>
+            <div class="modal-body">
+                <form id="editCategoryForm">
+                    <div class="form-group">
+                        <label for="name" class="col-form-label">
+                            Name:
+                        </label>
+                        <input type="text" class="form-control" id="name-modal" name="name" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="name" class="col-form-label">
+                            Code:
+                        </label>
+                        <input type="text" class="form-control" id="code-modal" name="code" value="">
+                    </div>
+                    <!-- Add more fields as needed -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn background-design" hidden id="edit-action-modal">Edit</button>
+                <button type="button" class="btn background-design" hidden id="create-action-modal">Create</button>
+                <button type="button" class="btn btn-danger"  id="del-action-modal" hidden>OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+

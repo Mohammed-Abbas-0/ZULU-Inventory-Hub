@@ -1,0 +1,147 @@
+﻿@using Microsoft.AspNetCore.Http
+@using System.Text
+
+@{ 
+    var refreshTokenBytes = Context.Session.Get("RefreshToken");
+    var refreshToken = refreshTokenBytes != null ? Encoding.UTF8.GetString(refreshTokenBytes) : null;
+ }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ZULU</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/lib/toastr.js/toastr.min.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+    <link rel="stylesheet" href="~/lib/datatables/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.dataTables.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+
+</head>
+<body>
+    <div class="wrapper">
+        @if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(Context.Session.GetString("RefreshToken")))
+        {
+<nav id="sidebar" class="bg-light border-right">
+    <div class="sidebar-header">
+        <h3>
+            ZULU
+            <img src="~/svgviewer-white.png" alt="logo" style="width: 100px; height: 100px;" />
+        </h3>
+        <p style="font-size:14px">Inventory Hub</p>
+    </div>
+
+    <ul class="list-unstyled components">
+        <li>
+            <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+        </li>
+        <li>
+            <a asp-area="" asp-controller="Category" asp-action="Index">Categories</a>
+        </li>
+        <li>
+            <a asp-area="" asp-controller="Products" asp-action="Index">Products</a>
+        </li>
+        <li>
+            <a asp-area="" asp-controller="Customer" asp-action="Index">Customers</a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="logout()">Logout</a>
+        </li>
+    </ul>
+</nav>}
+
+        <!-- Main Content -->
+        <div id="content">
+            @if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(Context.Session.GetString("RefreshToken")))
+            {
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+    <button type="button" id="sidebarCollapse" class="btn btn-info">
+        <i class="fas fa-bars"></i>
+    </button>
+</nav>            }
+            <main role="main" class="pb-3" style="padding:0 15px;">
+                @RenderBody()
+            </main>
+        </div>
+
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2024 - ZULU Inventory Hub - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </footer>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(Context.Session.GetString("RefreshToken")))
+    {
+        <script>
+              $(document).ready(function () {
+                    const checkTokenInterval = 5 * 60 * 1000;
+
+
+                    function refreshJwtToken() {
+
+                        $.ajax({
+                            url: '@Url.Action("RefreshToken","Account")',
+                            type: 'POST',
+                            contentType: 'application/json',
+
+                            success: function (data) {
+                                debugger
+                                console.log(data)
+                                if (data) {
+                                    sessionStorage.setItem('JWTToken', data.newToken);
+                                    sessionStorage.setItem('RefreshToken', data.newRefreshToken);
+                                } else {
+                                    console.error('Failed to refresh token');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error refreshing token');
+                            }
+                        });
+                    }
+
+                    setInterval(refreshJwtToken, checkTokenInterval);
+                });
+        </script>}
+
+
+    <script>
+    function logout() {
+            $.ajax({
+                url: '@Url.Action("Logout", "Account")',
+                type: 'POST',
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log('Logout successful:', data);
+                    window.location.href = '@Url.Action("Login", "Account")';
+                    sessionStorage.removeItem('JWTToken');
+                    sessionStorage.removeItem('RefreshToken');
+                },
+                error: function (xhr, status, error) {
+
+                    console.error('Error during logout:', error);
+                }
+            });
+        }
+
+
+    </script>
+
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/toastr.js/toastr.min.js"></script>
+    <script src="~/js/toastrOptions.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/spin.js@2.3.2/spin.min.js"></script>
+    <script src="~/lib/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

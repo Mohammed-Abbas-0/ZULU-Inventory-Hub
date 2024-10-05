@@ -1,0 +1,417 @@
+﻿@model IEnumerable<InventoryHubUI.Models.Category>
+
+
+
+@{
+    ViewData["Title"] = "Products";
+    var currentPage = ViewData["CurrentPage"] != null ? (int)ViewData["CurrentPage"] : 1;
+    var pageSize = ViewData["PageSize"] != null ? (int)ViewData["PageSize"] : 10;
+    var totalItems = ViewData["TotalItems"] != null ? (int)ViewData["TotalItems"] : 0;
+
+
+    var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+    var hasNextPage = currentPage < totalPages;
+    var hasPreviousPage = currentPage > 1;
+    int loop = 1;
+}
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    /* تنسيق الخلايا في الجدول */
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    /* تنسيق رأس الجدول */
+    th {
+        background-color: #f2f2f2;
+        text-align: left;
+    }
+
+    tr {
+        background-color: #ffffff;
+    }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+    td {
+        text-align: center;
+    }
+
+    .create-product {
+        position: fixed;
+        right: 10px;
+    }
+
+    .form-select {
+        border-radius: 5px;
+        width: 88px;
+        height: 34px;
+        font-size: 17px;
+        text-align: center;
+        margin: 0 5px;
+    }
+
+    .page-item.active .page-link {
+        color: #fff;
+        background-color: #438a7a;
+        border-color: #438a7a;
+    }
+
+    .page-item {
+    }
+</style>
+<div style="display:flex;align-items:center;padding:10px 15px;">
+    <h2 style="flex:1">Categories</h2>
+    <a class="btn background-design" style="color:#ffffff; cursor:pointer" id="btn-create">
+        <i class="bi bi-plus-circle"></i>
+        Create a new Category
+    </a>
+</div>
+<div class="row" style="background-color: #ffffff; margin: 0; padding: 15px 0; border-radius: 5px;">
+    <div class="col-md-4">
+        <label>
+            Show
+            <select id="categoryListTable_length" class="form-select">
+                <option value="10" selected>10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </label>
+    </div>
+    <div class="col-md-6"></div>
+    <div class="col-md-2">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+    </div>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th style="width:200px;">Sr.No</th>
+            <th class="d-none">Category ID</th>
+            <th>Category Name</th>
+            <th>Category Code</th>
+            <th style="width:400px;">Total Products in Category</th>
+            <th style="width:150px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @Html.Partial("_EditCategoryModal", Model)
+        @foreach (var Category in Model)
+        {
+            @Html.Partial("_EditCategoryModal", Category)
+            <tr id="@Category.CategoryId" style="line-height:4">
+                <td>@loop</td>
+                <td class="d-none">@Category.CategoryId</td>
+                <td class="Category-name">@Category.Name</td>
+                <td class="Category-code">@Category.Code</td>
+                <td>@Category.TotalProducts</td>
+                <td>
+                    <ul class="ul-actions">
+                        @*<li>
+                            <a class="action-view">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </li>*@
+                        <li>
+                            <a class="action-edit" data-id="@Category.CategoryId">
+                                <i class="bi bi-pencil-fill"></i>
+
+                            </a>
+                        </li>
+                        <li>
+                            <a  class="action-remove" data-id="@Category.CategoryId">
+                                <i class="bi bi-trash3-fill"></i>
+
+                            </a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+            loop++;
+        }
+    </tbody>
+</table>
+
+<!-- Pagination -->
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        <li class="page-item @(hasPreviousPage ? "" : "disabled")">
+            <a class="page-link" href="@Url.Action("Index", new { pageNumber = 1, pageSize })" tabindex="-1">First</a>
+        </li>
+        <li class="page-item @(hasPreviousPage ? "" : "disabled")">
+            <a class="page-link" href="@Url.Action("Index", new { pageNumber = currentPage - 1, pageSize })" tabindex="-1">Previous</a>
+        </li>
+
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == currentPage ? "active" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { pageNumber = i, pageSize })">@i</a>
+            </li>
+
+        }
+
+        <li class="page-item @(hasNextPage ? "" : "disabled")">
+            <a class="page-link" href="@Url.Action("Index", new { pageNumber = currentPage + 1, pageSize })">Next</a>
+        </li>
+        <li class="page-item @(hasNextPage ? "" : "disabled")">
+            <a class="page-link" href="@Url.Action("Index", new { pageNumber = totalPages, pageSize })">Last</a>
+        </li>
+    </ul>
+</nav>
+
+
+
+
+
+@section Scripts {
+
+
+    <script>
+
+        // Edit Area
+        $(document).on('click', '.action-edit', function () {
+        var id = $(this).data('id'); // الحصول على id الكتيجوري
+
+        $.ajax({
+            url: '@Url.Action("GetCategory", "Category")',
+            type: 'GET',
+            data: { id: id },
+            success: function (response) {
+                $(".modal-body").removeAttr('hidden')
+                $("#del-action-modal").attr('hidden',true)
+                $("#create-action-modal").attr('hidden',true)
+                $('#edit-action-modal').removeAttr('hidden'); // إزالة سمة hidden
+                $("#name-modal").val(response.category.name)
+                $("#code-modal").val(response.category.code)
+                $("#key").val(response.category.categoryId)
+                $(".modal-title").text("Category Details")
+                $('#editModal').modal('show'); // عرض الـ modal بناءً على الـ id
+            },
+            error: function () {
+                alert('Error loading the modal.');
+            }
+        });
+    });
+
+        $("#edit-action-modal").on("click", function () {
+        var formData = new FormData();
+
+        formData.append("CategoryId", $("#key").val());
+        formData.append("Name", $("#name-modal").val());
+        formData.append("Code", $("#code-modal").val());
+
+
+
+            $.ajax({
+            url: '@Url.Action("EditCategory", "Category")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response.success == 'true') {
+
+                        let category_id = response.categoryUpdated.categoryId;
+                        let trCategorySelected = `tbody tr#${category_id}`;
+                        $(`${trCategorySelected} td.Category-name`).text(response.categoryUpdated.name);
+                        $(`${trCategorySelected} td.Category-code`).text(response.categoryUpdated.code);
+                        $('#editModal').modal('hide');
+                        toastr.success(response.message, 'Sucesss');
+
+                    } else{
+                        $('#editModal').modal('hide'); // عرض الـ modal بناءً على الـ id
+                        toastr.success(response.message, 'Error');
+                    }
+
+            },
+            error: function () {
+                toastr.success('Error loading the modal.','Error');
+            }
+        });
+    })
+
+        // Remove Category  AREA
+
+        $(document).on('click', '.action-remove',  function () {
+            var id = $(this).data('id');
+            $("#key").val(id)
+            $(".modal-title").text("Are you sure to delete category?")
+            $('#create-action-modal').attr('hidden',true); // إزالة سمة hidden
+            $('#edit-action-modal').attr('hidden',true); // إزالة سمة hidden
+            $('#del-action-modal').removeAttr('hidden'); // إزالة سمة hidden
+            $(".modal-body").attr('hidden', true)
+            $('#editModal').modal('show'); // عرض الـ modal بناءً على الـ id
+
+        })
+
+        $("#del-action-modal").on('click',function () {
+            let id = $("#key").val(); // الحصول على id الكتيجوري
+
+            $.ajax({
+                url: '@Url.Action("DeleteCategory", "Category")',
+                type: 'Delete',
+                data: { id: id },
+                success: function (response) {
+                    if (response.success == 'true') {
+                        $('#editModal').modal('hide');
+                        // Remove td Category from table
+                        let trCategorySelected = `tbody tr#${id}`;
+                        $(`${trCategorySelected}`).remove();
+                        $('#editModal').modal('hide');
+
+                        toastr.success(response.message, 'Success');
+
+
+                    } else {
+                        $('#editModal').modal('hide');
+                        toastr.success(response.message, 'Error');
+                    }
+                },
+                error: function () {
+                    toastr.error('Error loading the modal.', 'Error');
+
+                }
+            });
+        });
+        //  END  AREA
+
+        // Create AREA
+
+        $("#btn-create").on("click", function () {
+            $("#name-modal").val('')
+            $("#code-modal").val('')
+            $("#key").val('')
+            $(".modal-title").text("Add a new Category.")
+            $('#edit-action-modal').attr('hidden', true); // إزالة سمة hidden
+            $('#del-action-modal').attr('hidden',true); 
+            $('#create-action-modal').removeAttr('hidden'); 
+            $(".modal-body").removeAttr('hidden')
+            $('#editModal').modal('show'); // عرض الـ modal بناءً على الـ id
+
+        })
+
+        $("#create-action-modal").on('click', function () {
+            let name = $("#name-modal").val();
+            let code = $("#code-modal").val();
+
+            if (name == "" || code == "")
+                return toastr('Name and Code is requied.', "info");
+
+            var formData = new FormData();
+            formData.append("Name",name);
+            formData.append("Code",code);
+
+            $.ajax({
+                url: '@Url.Action("CreateCategory", "Category")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response.success == 'true') {
+                        console.log(response)
+                        let id = response.categoryCreated.categoryId;
+                        let name = response.categoryCreated.name;
+                        let code = response.categoryCreated.code;
+                       // debugger
+                        var newRow = $(`<tr id='${id}' style='line-height:4'>
+                    <td>1</td>
+                    <td class='d-none'>${id}</td>
+                    <td class='Category-name'>${name}</td>
+                    <td class='Category-code'>${code}</td>
+                    <td>0</td>
+                    <td>
+                        <ul class="ul-actions">
+                            <li>
+                                <a class="action-edit" data-id="${id}">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="action-remove" data-id="${id}">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>`);
+                        // إضافة الصف الجديد إلى tbody
+                        $("table tbody").prepend(newRow);
+                        $("table tbody tr").each(function (index) {
+                            $(this).find("td:first").text(index + 1);
+                        });
+                        toastr.success(response.message, 'Success');
+                        $('#editModal').modal('hide'); // عرض الـ modal بناءً على الـ id
+
+                    } else {
+                        $('#editModal').modal('hide');
+                        toastr.success(response.message, 'Error');
+                    }
+                },
+                error: function () {
+                    toastr.error('Error loading the modal.', 'Error');
+
+                }
+            });
+        });
+        //END ARea
+
+
+
+        $(document).ready(function () {
+
+            GetSelectValueFromURL();
+            $("#categoryListTable_length").on("change", function () {
+
+                // الحصول على قيمة الحجم الجديد من القائمة المنسدلة
+                var pageSize = $(this).val();
+                //SetSelectValueToLocalStorage(pageSize);
+
+
+                var fullUrl = window.location.href;
+
+                // إنشاء كائن URL لتحليل الـ URL
+                var url = new URL(fullUrl);
+
+                // الحصول على الجزء الأساسي من الـ URL بدون معلمات الاستعلام
+                var baseUrl = url.origin + url.pathname;
+
+                // إعادة توجيه المستخدم إلى URL الجديد
+                window.location.href = baseUrl + "?pageNumber=1&pageSize=" + pageSize;
+            });
+        });
+
+
+        function GetSelectValueFromURL() {
+
+            // Create a new URL object
+            const url = new URL(window.location.href);
+
+            const searchParams = url.searchParams; // URLSearchParams object containing query parameters
+
+            // Access individual query parameters
+            const pageSize = searchParams.get('pageSize'); // '20'
+            if (pageSize)
+                $("#categoryListTable_length").val(pageSize);
+
+        }
+
+        // Search Table
+        $('#searchInput').on('keyup', function () {
+            var value = $(this).val().toLowerCase();
+            $('table tbody tr').filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+
+    </script>
+}
+

@@ -1,0 +1,128 @@
+﻿
+<style>
+    @@media (min-width: 576px) {
+        .modal-dialog {
+            max-width: 800px !important;
+        }
+    }
+
+    input[type="text"] {
+        border: 1px solid #e2e2e2;
+    }
+
+    .div-Image-Area {
+        text-align: center;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        margin: 10px 0;
+    }
+
+    .img-area {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+        .img-area img {
+            width: 100%;
+            height: 100%;
+        }
+
+    .layout-circle {
+        border-radius: 50%;
+        padding: 9px;
+        border: 1px solid #bababa;
+        background: #bababa;
+    }
+</style>
+<div class="modal fade" id="CustomerModal" tabindex="-1" role="dialog" aria-labelledby="CustomerModalLabel" aria-hidden="true" style="top:10%;">
+    <input id="key-CustomerId" value="" hidden />
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="CustomerModalLabel">
+                </h5>
+            </div>
+            <div class="modal-body">
+                <form id="CustomerForm">
+                    <div class="row">
+                        <div class="col-md-12 div-Image-Area">
+                            <div class="icon-upload-image">
+                                <input type="file" style="display:none" id="file-upload-image" />
+                                <span id="upload-image" style="position: absolute; bottom: 0; left: 53%; font-size: 18px; padding: 4px 11px; background: #f3f1f1; border-radius: 50%; color: #817a7a;cursor:pointer; ">
+                                    <i class="bi bi-image-fill"></i>
+                                </span>
+                            </div>
+                            <div class="layout-circle">
+
+                                <div class="img-area">
+                                    <img id="customer-image" src="~/Images/Dark Default Pfp.jpeg" alt="Customer Photo" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="firstname" class="col-form-label">
+                                    First Name <span style="color:red;">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="FirstName-modal" name="firstname" value="" placeholder="Enter First Name">
+
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="lastname" class="col-form-label">
+                                    Last Name <span style="color:red;">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="LastName-modal" name="lastname" value="" placeholder="Enter Last Name">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="email" class="col-form-label">
+                                    Email <span style="color:red;">*</span>
+                                </label>
+                                <input type="email" class="form-control" id="Email-modal" name="email" value="" placeholder="Enter Email">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="phone" class="col-form-label">
+                                    Phone <span style="color:red;">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="Phone-modal" name="phone" value="" placeholder="Enter Phone">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="address" class="col-form-label">
+                                    Address <span style="color:red;">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="Address-modal" name="address" value="" placeholder="Enter Address">
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Add more fields as needed -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn background-design" hidden id="edit-action-modal">Edit</button>
+                <button type="button" class="btn background-design" hidden id="create-action-modal">Create</button>
+                <button type="button" class="btn btn-danger" id="del-action-modal" hidden>OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+

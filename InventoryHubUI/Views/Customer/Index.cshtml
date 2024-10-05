@@ -1,0 +1,599 @@
+﻿@model List<CustomerViewModel>
+
+<style>
+    table.dataTable tbody tr {
+        background-color: white !important; /* جعل خلفية جميع الصفوف بيضاء */
+    }
+
+    table.dataTable th, table.dataTable td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        text-align: left; /* المحاذاة إلى اليسار لجميع الأعمدة */
+    }
+
+
+    #customersTable_wrapper {
+        background: #ffffff;
+        padding: 15px 20px;
+        border-radius: 13px;
+    }
+    /*Pagination Colors*/
+    /* تغيير لون الخلفية لعناصر الـ pagination */
+    .customersTable_wrapper .dt-paging .paginate_button {
+        background: #007bff; /* لون الخلفية */
+        color: white; /* لون النص */
+    }
+
+        /* تغيير لون الخلفية لعناصر الـ pagination عند التحويم */
+        .customersTable_wrapper .dt-paging .paginate_button:hover {
+            background: #0056b3; /* لون الخلفية عند التحويم */
+            color: white; /* لون النص عند التحويم */
+        }
+
+        /* تغيير لون الخلفية لعناصر الـ pagination النشطة */
+        .customersTable_wrapper.dt-paging .paginate_button.current {
+            background: #0056b3; /* لون الخلفية للزر النشط */
+            color: white; /* لون النص للزر النشط */
+        }
+
+    .badge-soft-active {
+        color: #934fb0;
+        background-color: #934fb01a;
+        padding: 6px 10px;
+        border-radius: 5px;
+    }
+
+    .badge-soft-danger {
+        color: #ed4343;
+        background-color: #ed43431a;
+        padding: 6px 10px;
+        border-radius: 5px;
+    }
+
+    .table-action span {
+        padding: 5px 8px;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-left: 10px;
+    }
+
+        .table-action span:first-of-type {
+            background: #4a4848;
+            color: #ffffff;
+        }
+
+            .table-action span:first-of-type:hover {
+                background: #8c8c8c;
+            }
+
+        .table-action span:nth-child(2) {
+            background: #50b0f3;
+            color: #ffffff;
+        }
+
+            .table-action span:nth-child(2):hover {
+                background: #8ac9f5;
+            }
+
+        .table-action span:nth-child(3) {
+            background: #febd49;
+            color: #ffffff;
+        }
+
+            .table-action span:nth-child(3):hover {
+                background: #ffd280;
+            }
+
+        .table-action span:last-of-type {
+            background: #cb6a6a;
+            color: #ffffff;
+        }
+
+            .table-action span:last-of-type:hover {
+                background: #db3939;
+            }
+</style>
+<div style="padding:15px 0;margin:10px 0;">
+    <h3 class="mb-3">Customers</h3>
+    <button class="btn btn-primary" onclick="DisplayCustomerView()">
+        <i class="bi bi-plus"></i>
+        Add Customer
+    </button>
+</div>
+<table id="customersTable" class="display">
+    <thead>
+        <tr>
+            <th class="text-center">#</th>
+            <th class="text-center" hidden>Id</th>
+            <th class="text-center">First Name</th>
+            <th class="text-center">Last Name</th>
+            <th class="text-center">Email</th>
+            <th class="text-center">Mobile</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in Model)
+        {
+            <tr style="height:75px">
+                <td class="text-center"></td>
+                <td class="text-center" hidden id="CustomerId-@customer.CustomerId">@customer.CustomerId</td>
+                <td class="text-center">@customer.FirstName</td>
+                <td class="text-center">@customer.LastName</td>
+                <td class="text-center">@customer.Email</td>
+                <td class="text-center">@customer.PhoneNumber</td>
+                @if (customer.IsActive)
+                {
+                    <td class="text-center">
+                        <span class="badge-soft-active">Active</span>
+                    </td>
+                }
+                else
+                {
+                    <td class="text-center">
+                        <span class="badge-soft-danger">Disabled</span>
+                    </td>
+                }
+
+
+                <td class="text-center table-action">
+                    <div style="display:flex">
+                        <span title="View" onclick="ViewCustomer(@customer.CustomerId)"><i class="bi bi-eye"></i></span>
+                        <span title="Edit" onclick="EditCustomer(@customer.CustomerId)"><i class="bi bi-pencil"></i></span>
+                        <span title="Change Status" onclick="ChangeStatus(@customer.CustomerId)"><i class="bi bi-arrow-repeat"></i></span>
+                        <span title="Delete"  onclick="Delete(@customer.CustomerId)"><i class="bi bi-trash3"></i></span>
+                    </div>
+                </td>
+
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+@await Html.PartialAsync("_CustomerPartial")
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $('#customersTable').DataTable({
+                language: {
+                    lengthMenu: "Show Results:  _MENU_", // تغيير النص
+                    zeroRecords: "لا توجد سجلات متاحة", // نص عندما لا توجد سجلات
+                    info: "show _START_ from _TOTAL_ ", // نص معلومات الصفحات
+                    infoEmpty: "لا توجد سجلات", // نص عندما تكون النتائج فارغة
+                    infoFiltered: "(تصفية من _MAX_ إجمالي السجلات)", // نص لتصفية النتائج
+                    search: "Search:", // نص شريط البحث
+                },
+                lengthMenu: [10, 25, 50,100], // عدد الإدخالات لكل صفحة
+                "pageLength": 10, // عدد الصفوف التي تظهر في كل صفحة (يمكنك تغيير الرقم)
+                "columnDefs": [{
+                    "searchable": false, // تعطيل البحث في عمود الأرقام
+                    "orderable": false,  // تعطيل الترتيب في عمود الأرقام
+                    "targets": 0,       // تحديد أن العمود الأول هو الذي سيتم استخدامه للأرقام
+                    "render": function (data, type, row, meta) {
+                        return meta.row + 1; // عرض الرقم التسلسلي للصف
+                    }
+                }, {
+                        "targets": 1,    // العمود الثاني (الذي يحتوي على Id)
+                        "visible": false, // إخفاء العمود
+                      //  "searchable": false // عدم جعله قابلاً للبحث
+                    }],
+               // "order": [[1, 'desc']] // ترتيب الجدول بالاعتماد على العمود الثاني (الاسم)
+            });
+        });
+        function DisplayCustomerView() {
+            $("#CustomerModalLabel").text("Create Customer");
+
+                $('#create-action-modal').removeAttr('hidden');
+                $('#del-action-modal').attr('hidden',true);
+                $('#edit-action-modal').attr('hidden',true);
+                $("#CustomerModal #key-CustomerId").val('')
+                $("#FirstName-modal").val('')
+                $("#FirstName-modal").removeAttr('disabled')
+                $("#LastName-modal").val('')
+                $("#LastName-modal").removeAttr('disabled')
+                $("#Email-modal").val('')
+                $("#Email-modal").removeAttr('disabled')
+                $("#Address-modal").val('')
+                $("#Address-modal").removeAttr('disabled')
+                $("#Phone-modal").val('')
+                $("#Phone-modal").removeAttr('disabled')
+                $("#customer-image").attr('src', '@Url.Content("~/Images/Dark Default Pfp.jpeg")');
+                $("#file-upload-image").removeAttr('disabled')
+
+                $("#CustomerModal").modal("show")
+
+
+        }
+
+        $("#upload-image").on("click", function () {
+            $("#file-upload-image").click();
+
+        })
+
+        document.getElementById('file-upload-image').addEventListener('change', function () {
+
+            var file = this.files[0];
+            if (file) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('.img-area img').attr("src", e.target.result);
+                };
+
+                reader.readAsDataURL(file);
+
+
+            }
+        });
+
+        // End Areas
+
+        // Create Customer
+        $("#create-action-modal").on("click", function () {
+
+            if (($("#FirstName-modal").val().trim() == '' || !$("#FirstName-modal").val()) ||
+                ($("#LastName-modal").val().trim() == '' || !$("#LastName-modal").val()) ||
+                ($("#Phone-modal").val().trim() == '' || !$("#Phone-modal").val()) ||
+                ($("#Email-modal").val().trim() == '' || !$("#Email-modal").val() )||
+                ($("#Address-modal").val().trim() == '' || !$("#Address-modal").val()) ) {
+                toastr.info('Please fill in all required fields.', 'Validation Error');
+                return;
+            }
+               //CustomerForm
+                var formData = new FormData();
+                formData.append("FirstName", $("#FirstName-modal").val());
+                formData.append("LastName", $("#LastName-modal").val());
+                formData.append("Address", $("#Address-modal").val());
+                formData.append("PhoneNumber", $("#Phone-modal").val());
+                formData.append("Email", $("#Email-modal").val());
+
+                var fileInput = document.getElementById('file-upload-image');
+                if (fileInput.files.length > 0) {
+                    formData.append("CustomerImage", fileInput.files[0]);
+                }
+                var spinner = new Spinner().spin();
+                document.body.appendChild(spinner.el);
+                spinner.spin(document.body);
+
+                $.ajax({
+                    url: '@Url.Action("CreateCustomer", "Customer")',
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response.success == "true") {
+                            $("#CustomerModal").modal("hide");
+                            // إضافة صف جديد إلى DataTable
+                            var table = $('#customersTable').DataTable(); // الحصول على DataTable
+                            // إضافة صف جديد كأول صف في DataTable
+                            var newRow = table.row.add([
+                                0,  // الرقم التسلسلي
+                                response.customer.firstName,  // First Name
+                                response.customer.lastName,   // Last Name
+                                response.customer.email,      // Email
+                                response.customer.phoneNumber, // Phone Number,
+                                response.customer.isActive ? '<span class="badge-soft-active">Active</span>' : '<span class="badge-soft-danger">Disabled</span>',
+                                '<div style="display:flex">' + // Action Buttons
+                                '<span title="View"><i class="bi bi-eye"></i></span>' +
+                                '<span title="Edit"><i class="bi bi-pencil"></i></span>' +
+                                '<span title="Change Status"><i class="bi bi-arrow-repeat"></i></span>' +
+                                '<span title="Delete"><i class="bi bi-trash3"></i></span></div>' +
+                                '</div>'
+                            ]).draw(false); // إضافة الصف ولكن لا تقم بتحديث الجدول مباشرة
+
+                            $(newRow.node()).prependTo('#customersTable tbody');
+                            // إعادة ترتيب الأرقام التسلسلية لكل الصفوف بناءً على الصفحة الحالية
+                            $("table tbody tr").each(function (index) {
+                                $(this).find("td:first").text(index + 1);
+                            });
+
+                            $(newRow.node()).find('td').addClass('text-center');
+                            $(newRow.node()).find('td:last').addClass('table-action');
+
+                            // يمكنك إفراغ الحقول بعد الإضافة إن كنت بحاجة
+                          //  $('#addCustomerForm')[0].reset();
+                            toastr.success(response.message, 'Sucesss');
+                            spinner.stop();
+                        } else {
+
+                            toastr.error(response.message, 'Error');
+                            spinner.stop();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        toastr.error("Failed to add the product.", 'Error');
+                        spinner.stop();
+                    }
+                });
+        })
+
+        // View Customer
+        function ViewCustomer(CustomerId) {
+
+            $.ajax({
+                url: '@Url.Action("GetCustomerById", "Customer")',
+                type: "GET",
+                data: { CustomerId:CustomerId },
+                success: function (response) {
+                    if (response.success == 'true') {
+                        $("#CustomerModalLabel").text("Customer " + `${response.customer.firstName + response.customer.lastName}`);
+                        $('#create-action-modal').attr('hidden', true);
+                        $('#del-action-modal').attr('hidden',true);
+                        $('#edit-action-modal').attr('hidden',true);
+                        $("#CustomerModal #key-CustomerId").val(response.customer.customerId)
+                        $("#FirstName-modal").val(response.customer.firstName)
+                        $("#FirstName-modal").attr('disabled',true)
+                        $("#LastName-modal").val(response.customer.lastName)
+                        $("#LastName-modal").attr('disabled',true)
+                        $("#Email-modal").val(response.customer.email)
+                        $("#Email-modal").attr('disabled',true)
+                        $("#Address-modal").val(response.customer.address)
+                        $("#Address-modal").attr('disabled',true)
+                        $("#Phone-modal").val(response.customer.phoneNumber)
+                        $("#Phone-modal").attr('disabled',true)
+                        var imageUrl = response.customer.customerImageUrl || '@Url.Content("~/Images/Dark Default Pfp.jpeg")';
+                        $("#customer-image").attr('src', imageUrl);
+                        $("#CustomerModal").modal("show")
+                        $("#file-upload-image").attr('disabled',true)
+
+
+                    }
+                    else {
+                        toastr.error(response.message, 'Error');
+                    }
+                },
+                error: function () {
+                    toastr.error("Failed to add the product.", 'Error');
+                }
+            })
+        }
+
+        // END VIEW AREA
+
+
+         // Edit Customer
+        function EditCustomer(CustomerId) {
+
+            $.ajax({
+                url: '@Url.Action("GetCustomerById", "Customer")',
+                type: "GET",
+                data: { CustomerId:CustomerId },
+                success: function (response) {
+                    if (response.success == 'true') {
+                        $("#CustomerModalLabel").text("Edit Customer");
+                        $('#create-action-modal').attr('hidden', true);
+                        $('#del-action-modal').attr('hidden',true);
+                        $('#edit-action-modal').removeAttr('hidden');
+
+                        $("#key-CustomerId").val(response.customer.customerId)
+                        $("#FirstName-modal").val(response.customer.firstName)
+                        $("#FirstName-modal").removeAttr('disabled')
+                        $("#LastName-modal").val(response.customer.lastName)
+                        $("#LastName-modal").removeAttr('disabled')
+                        $("#Email-modal").val(response.customer.email)
+                        $("#Email-modal").removeAttr('disabled')
+                        $("#Address-modal").val(response.customer.address)
+                        $("#Address-modal").removeAttr('disabled')
+                        $("#Phone-modal").val(response.customer.phoneNumber)
+                        $("#Phone-modal").removeAttr('disabled')
+                        var imageUrl = response.customer.customerImageUrl || '@Url.Content("~/Images/Dark Default Pfp.jpeg")';
+                        $("#customer-image").attr('src', imageUrl);
+                        $("#CustomerModal").modal("show")
+                      //  document.getElementById("file-upload-image").click();
+                        $("#file-upload-image").removeAttr('disabled')
+                        }
+                     else {
+                        toastr.error(response.message, 'Error');
+                    }
+                },
+                error: function () {
+                    toastr.error("Failed to add the product.", 'Error');
+                }
+            })
+        }
+
+
+        $("#edit-action-modal").on("click", function () {
+             if (($("#FirstName-modal").val().trim() == '' || !$("#FirstName-modal").val()) ||
+                ($("#LastName-modal").val().trim() == '' || !$("#LastName-modal").val()) ||
+                ($("#Phone-modal").val().trim() == '' || !$("#Phone-modal").val()) ||
+                ($("#Email-modal").val().trim() == '' || !$("#Email-modal").val() )||
+                ($("#Address-modal").val().trim() == '' || !$("#Address-modal").val()) ) {
+                toastr.info('Please fill in all required fields.', 'Validation Error');
+                return;
+            }
+               //CustomerForm
+                var formData = new FormData();
+                formData.append("CustomerId", $("#key-CustomerId").val());
+                formData.append("FirstName", $("#FirstName-modal").val());
+                formData.append("LastName", $("#LastName-modal").val());
+                formData.append("Address", $("#Address-modal").val());
+                formData.append("PhoneNumber", $("#Phone-modal").val());
+                formData.append("Email", $("#Email-modal").val());
+                let imgSrc = $("#customer-image").attr("src")
+                formData.append("CustomerImageUrl", imgSrc);
+
+                var fileInput = document.getElementById('file-upload-image');
+                if (fileInput.files.length > 0) {
+                    formData.append("CustomerImage", fileInput.files[0]);
+                }
+                var spinner = new Spinner().spin();
+                document.body.appendChild(spinner.el);
+                spinner.spin(document.body);
+
+            $.ajax({
+                url: '@Url.Action("EditCustomer", "Customer")',
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                if (response.success == 'true') {
+
+                    updateCustomerRow(response.customer);
+
+                    $("#CustomerModal").modal("hide")
+                    toastr.success(response.message, 'Sucesss');
+                    spinner.stop();
+                }
+                else {
+                    toastr.error(response.message, 'Error');
+                    spinner.stop();
+
+                }
+                },
+                error: function () {
+                    toastr.error("Failed to add the product.", 'Error');
+                    spinner.stop();
+
+                }
+            })
+
+
+
+
+        })
+
+        document.getElementById("file-upload-image").addEventListener("change", function (event) {
+
+            var file = event.target.files[0]; // احصل على أول ملف تم اختياره
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    // تعيين الصورة على العنصر img
+                    document.getElementById("customer-image").src = e.target.result;
+                };
+                reader.readAsDataURL(file); // قراءة الملف كـ Data URL
+            } else {
+                // إذا لم يتم اختيار ملف، يمكنك التحقق من الصورة الموجودة
+                console.log("No file selected. Current image source is:", document.getElementById("customer-image").src);
+            }
+        });
+        // وظيفة لتحديث الصف بناءً على CustomerId
+        function updateCustomerRow(result) {
+
+            let CustomerId = $("#key-CustomerId").val();
+
+
+            var table = $('#customersTable').DataTable();
+
+            var rowIdx = table.rows().indexes().filter(function (idx) {
+
+                return table.cell(idx, 1).data() == CustomerId;
+            })[0];
+            // تحقق مما إذا كان الصف موجودًا
+            if (rowIdx !== undefined) {
+                // تعديل الاسم الأول والاسم الأخير
+                table.cell(rowIdx, 2).data(result.firstName).draw(false); // تعديل العمود 2 (First Name)
+                table.cell(rowIdx, 3).data(result.lastName).draw(false); // تعديل العمود 3 (Last Name)
+                table.cell(rowIdx, 4).data(result.email).draw(false);
+                table.cell(rowIdx, 5).data(result.phoneNumber).draw(false);
+            } else {
+                console.log('Row not found');
+            }
+        }
+        // END VIEW AREA
+
+        // Change Status
+        function ChangeStatus(CustomerId) {
+            $.ajax({
+                url: '@Url.Action("ChangeStatus", "Customer")',
+                type: "POST",
+                data: { CustomerId: CustomerId },
+
+                success: function (response) {
+                    if (response.success == 'true') {
+
+                    let isActive = (response.isActive == 'True') ?'Active':'Disabled';
+                    let addClassName = (response.isActive == 'True') ?'badge-soft-active':'badge-soft-danger';
+                    var table = $('#customersTable').DataTable();
+
+                    var rowIdx = table.rows().indexes().filter(function (idx) {
+
+                        return table.cell(idx, 1).data() == CustomerId;
+                    })[0];
+                    // تحقق مما إذا كان الصف موجودًا
+                        if (rowIdx !== undefined) {
+
+                            var cell = table.cell(rowIdx, 6).node();
+                            $(cell).find('span').text(isActive); // تغيير النص داخل span
+                            $(cell).find('span').removeClass('badge-soft-active badge-soft-danger').addClass(addClassName);
+
+                    } else {
+                        console.log('Row not found');
+                    }
+
+
+                    toastr.success(response.message, 'Sucesss');
+
+                }
+                else {
+                    toastr.error(response.message, 'Error');
+
+
+                }
+                },
+                error: function () {
+                    toastr.error("Failed to add the product.", 'Error');
+
+
+                }
+            })
+
+        }
+
+        // Delete Customer
+        function Delete(CustomerId) {
+            $.ajax({
+                url: '@Url.Action("DeleteCustomer", "Customer")',
+                type: "POST",
+                data: { CustomerId: CustomerId },
+
+                success: function (response) {
+                    if (response.success == 'true') {
+                    var table = $('#customersTable').DataTable();
+
+                    var rowIdx = table.rows().indexes().filter(function (idx) {
+
+                        return table.cell(idx, 1).data() == CustomerId;
+                    })[0];
+                    // تحقق مما إذا كان الصف موجودًا
+                        if (rowIdx !== undefined) {
+                            table.row(rowIdx).remove().draw(false); // draw(false) سيعيد ترتيب الجدول دون إعادة تحميل الصفحة
+
+                    } else {
+                        console.log('Row not found');
+                    }
+                        $("table tbody tr").each(function (index) {
+                            $(this).find("td:first").text(index + 1);
+                        });
+
+                    toastr.success(response.message, 'Sucesss');
+
+                }
+                else {
+                    toastr.error(response.message, 'Error');
+
+
+                }
+                },
+                error: function () {
+                    toastr.error("Failed to add the product.", 'Error');
+
+
+                }
+            })
+
+        }
+
+
+
+    </script>
+}
+
+

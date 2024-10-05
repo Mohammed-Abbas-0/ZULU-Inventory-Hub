@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Unauthorized Access";
+}
+<style>
+    .container {
+        margin-top: 100px;
+    }
+
+    h1.display-4 {
+        font-size: 3.5rem;
+        color: #ff4b4b;
+    }
+
+    .lead {
+        margin-bottom: 30px;
+        font-size: 1.25rem;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+</style>
+
+<div class="container text-center">
+    <h1 class="display-4">Access Denied</h1>
+    <p class="lead">Sorry, you don't have permission to access this page.</p>
+    <a href="/Account/Login" class="btn btn-primary">Login</a>
+    <a href="/" class="btn btn-secondary">Go to Home</a>
+</div>

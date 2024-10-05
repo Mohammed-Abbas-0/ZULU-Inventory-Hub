@@ -1,0 +1,23 @@
+﻿.select2-container--classic .select2-selection--single {
+    height: 38px; /* ضبط ارتفاع الـ select */
+    border: 1px solid #ced4da; /* لون الحدود */
+    border-radius: 0.25rem; /* حواف دائرية */
+    padding: 6px 12px; /* تحسين الفراغ الداخلي */
+    font-size: 1rem; /* حجم النص */
+}
+
+    .select2-container--classic .select2-selection--single .select2-selection__rendered {
+        color: #495057; /* لون النص */
+    }
+
+    .select2-container--classic .select2-selection--single .select2-selection__arrow {
+        height: 34px; /* ضبط ارتفاع السهم */
+    }
+
+    .select2-container--classic .select2-selection--single .select2-selection__clear {
+        margin-right: 10px; /* مساحة بين زر الإزالة والنص */
+    }
+
+.select2 {
+    width: 100% !important;
+}

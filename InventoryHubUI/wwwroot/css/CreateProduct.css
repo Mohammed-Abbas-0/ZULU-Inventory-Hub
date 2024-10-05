@@ -1,0 +1,59 @@
+﻿.image-upload-container {
+    border: 2px dashed #d3d3d3; /* حدود منقطة بلون رمادي فاتح */
+    border-radius: 10px; /* زوايا مستديرة */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: #fafafa; /* خلفية رمادية خفيفة */
+    cursor: pointer; /* مؤشر الفأرة يتغير عند التمرير فوق الحاوية */
+    transition: border-color 0.3s ease-in-out; /* تأثير عند التمرير لتغيير لون الحدود */
+    padding: 20px; /* مسافة داخلية حول المحتوى */
+    align-items: center;
+    margin: 20px 0;
+    border: 2px dashed #282626;
+    height: 80%;
+    width:100%;
+}
+
+
+    .image-upload-container:hover {
+        border-color: #007bff; /* تغيير لون الحدود عند التمرير إلى أزرق */
+    }
+
+.file-input {
+    display: none; /* إخفاء حقل رفع الصورة */
+}
+
+.upload-message {
+    color: #888; /* لون النص التوضيحي */
+}
+
+.upload-message i {
+    font-size: 32px; /* حجم أيقونة رفع الصورة */
+    margin-bottom: 10px; /* مسافة أسفل الأيقونة */
+    color: #007bff; /* لون الأيقونة الأزرق */
+}
+
+.upload-message p {
+    margin: 0;
+    font-size: 14px; /* حجم النص التوضيحي */
+    color: #666; /* لون النص الفاتح */
+}
+
+.ImageArea {
+    border: 1px solid #cfc9c9;
+    background-color: #ffffff;
+    border-radius: 5px;
+    border-radius: 5px;
+    padding: 18px 8px;
+}
+.image-background {
+    height: auto;
+    width: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.span-wraning{
+    color:red;
+}
