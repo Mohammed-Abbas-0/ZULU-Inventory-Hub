@@ -548,49 +548,62 @@
         }
 
         // Delete Customer
+       
+
         function Delete(CustomerId) {
-            $.ajax({
-                url: '@Url.Action("DeleteCustomer", "Customer")',
-                type: "POST",
-                data: { CustomerId: CustomerId },
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to recover this item!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                // Execute the delete operation here
+                $.ajax({
+                    url: '@Url.Action("DeleteCustomer", "Customer")',
+                    type: "POST",
+                    data: { CustomerId: CustomerId },
+                    success: function (response) {
+                        if (response.success == 'true') {
+                            var table = $('#customersTable').DataTable();
+                            var rowIdx = table.rows().indexes().filter(function (idx) {
+                                return table.cell(idx, 1).data() == CustomerId; // Assume column 1 contains CustomerId
+                            })[0];
 
-                success: function (response) {
-                    if (response.success == 'true') {
-                    var table = $('#customersTable').DataTable();
+                            // Check if the row exists
+                            if (rowIdx !== undefined) {
+                                table.row(rowIdx).remove().draw(false); // draw(false) will reorder the table without refreshing
+                            } else {
+                                console.log('Row not found');
+                            }
 
-                    var rowIdx = table.rows().indexes().filter(function (idx) {
+                            // Reorder row numbers
+                            $("table tbody tr").each(function (index) {
+                                $(this).find("td:first").text(index + 1);
+                            });
 
-                        return table.cell(idx, 1).data() == CustomerId;
-                    })[0];
-                    // تحقق مما إذا كان الصف موجودًا
-                        if (rowIdx !== undefined) {
-                            table.row(rowIdx).remove().draw(false); // draw(false) سيعيد ترتيب الجدول دون إعادة تحميل الصفحة
-
-                    } else {
-                        console.log('Row not found');
+                            toastr.success(response.message, 'Success');
+                        } else {
+                            toastr.error(response.message, 'Error');
+                        }
+                    },
+                    error: function () {
+                        toastr.error("Failed to delete the item.", 'Error');
                     }
-                        $("table tbody tr").each(function (index) {
-                            $(this).find("td:first").text(index + 1);
-                        });
+                });
 
-                    toastr.success(response.message, 'Sucesss');
-
-                }
-                else {
-                    toastr.error(response.message, 'Error');
-
-
-                }
-                },
-                error: function () {
-                    toastr.error("Failed to add the product.", 'Error');
-
-
-                }
-            })
-
+                // Success confirmation message
+                Swal.fire(
+                    'Deleted!',
+                    'The item has been deleted.',
+                    'success'
+                );
+            }
+            });
         }
-
 
 
     </script>

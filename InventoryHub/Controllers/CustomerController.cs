@@ -74,9 +74,12 @@ namespace InventoryHub.Controllers
         #endregion
 
         #region  CREATE  CUSTOMER
-        [HttpPut("CreateCustomer")]
+        [HttpPost("CreateCustomer")]
         public async Task<IActionResult> CreateCustomer([FromForm] CustomerViewModel customerViewModel)
         {
+            if(!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if (customerViewModel is null)
                 return BadRequest("Try to Created Customer Again.");
 
@@ -89,9 +92,17 @@ namespace InventoryHub.Controllers
 
             try
             {
+
+
                 if(customerViewModel.CustomerImage != null)
                     customerViewModel.CustomerImageUrl = customerViewModel.CustomerImage.FileName;
                 var customer = _mapper.Map<Customer>(customerViewModel);
+
+                bool isExisted = await _customerQuery.IsExisted(customer);
+                if (isExisted)
+                    return BadRequest("Customer Name or Email already exists.");
+
+
                 await _unitOfWork.Customers.AddAsync(customer);
                 await _unitOfWork.CompleteAsync();
 

@@ -36,5 +36,14 @@ namespace InventoryHub.ServicesPatterns.Implementation
             return products;
         }
 
+        public async Task<bool> IsExisted(Customer customer)
+        {
+            var isExisted = await _context.Customers
+                .AnyAsync(idx =>
+                (idx.Email.Trim() == customer.Email.Trim()) 
+                    || (idx.FirstName + idx.LastName == customer.FirstName + customer.LastName)
+                );
+            return isExisted;
+        }
     }
 }

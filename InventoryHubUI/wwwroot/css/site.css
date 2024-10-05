@@ -181,3 +181,29 @@ ul.ul-actions
             background: #ed4343;
             color: #ffffff;
         }
+
+.profile_menu {
+    position: absolute;
+    width: 200px;
+    top: 71px;
+    background: #ffffff;
+    text-align: center;
+    padding: 0;
+    border-radius: 5px;
+}
+    .profile_menu ul {
+        text-align: center;
+        padding:0;
+    }
+        .profile_menu ul li.link {
+            font-family: monospace;
+            margin: 0 6px 3px;
+            padding: 5px 0;
+            cursor: pointer;
+        }
+        .profile_menu ul li.link:last-child {
+            color:red;
+        }
+            .profile_menu ul li.link:hover {
+                background-color: #f3f3f3;
+            }

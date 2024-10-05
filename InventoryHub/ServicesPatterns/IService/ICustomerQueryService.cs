@@ -10,5 +10,6 @@ namespace InventoryHub.ServicesPatterns.IService
     {
         Task<IEnumerable<Customer>> GeCutomersAsync(int pageNumber, int pageSize);
         Task<bool> ChangeStatus(int id);
+        Task<bool> IsExisted(Customer customer);
     }
 }

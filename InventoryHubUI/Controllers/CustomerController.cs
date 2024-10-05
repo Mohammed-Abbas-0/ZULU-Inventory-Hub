@@ -54,15 +54,26 @@ namespace InventoryHubUI.Controllers
 
             string url = $"{API_EndPoint.CreateCustomerENDPoint}";
 
-            var response = await _httpClient.PutAsync(url,formData);
+            var response = await _httpClient.PostAsync(url,formData);
 
-            if(response.IsSuccessStatusCode)
+            if(response.IsSuccessStatusCode )
             {
                 var Content = await response.Content.ReadAsStringAsync();
-                var jsonConvert = JsonConvert.DeserializeObject<GetCustomerViewModel>(Content);
-                return Json(new { Customer = jsonConvert,success="true" });
-            }
 
+                if(response.StatusCode == System.Net.HttpStatusCode.Created)
+                {
+                    var jsonConvert = JsonConvert.DeserializeObject<GetCustomerViewModel>(Content);
+                    return Json(new { Customer = jsonConvert,success="true" });
+
+                }
+
+
+            }
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                var msgError = await response.Content.ReadAsStringAsync();
+                return Json(new { message = msgError, success = "false" });
+            }
             return Json(new {message="Try Again", success="false" });
         }
 
