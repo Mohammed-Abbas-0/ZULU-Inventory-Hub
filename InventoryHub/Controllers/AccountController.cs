@@ -69,6 +69,8 @@ namespace InventoryHub.Controllers
 
             return Ok(new
             {
+                FirstName=result.FirstName,
+                LastName=result.LastName,
                 UserId = result.UserId,
                 token = result.Token,
                 refreshToken = result.RefreshToken,

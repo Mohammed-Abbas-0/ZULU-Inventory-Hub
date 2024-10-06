@@ -4,6 +4,8 @@
 @{ 
     var refreshTokenBytes = Context.Session.Get("RefreshToken");
     var refreshToken = refreshTokenBytes != null ? Encoding.UTF8.GetString(refreshTokenBytes) : null;
+    var firstName = User.Claims.FirstOrDefault(c => c.Type == "FirstName")?.Value;
+    var lastName = User.Claims.FirstOrDefault(c => c.Type == "LastName")?.Value;
  }
 <!DOCTYPE html>
 <html lang="en">
@@ -47,57 +49,63 @@
                     <li>
                         <a asp-area="" asp-controller="Customer" asp-action="Index">Customers</a>
                     </li>
-                    <li>
-                        <a href="javascript:void(0);" onclick="logout()">Logout</a>
-                    </li>
                 </ul>
             </nav>}
 
         <!-- Main Content -->
-        <div id="content">
-            @if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(Context.Session.GetString("RefreshToken")))
-            {
-                <nav class="navbar-header navbar navbar-expand-lg navbar-light bg-white border-bottom" style="display: flex; -ms-flex-pack: justify; justify-content: flex-end; align-items: center; margin: 0 auto; height: 70px; padding: 0 1.5rem 0 .75rem;">
-                    <div class="dropdown header-item" style="height: 70px; display: flex; align-items: center;">
-                        <button type="button" class="btn" id="page-header-user-dropdown">
-                            <span class="d-flex align-items-center">
-                                <img alt="Header Avater" src="~/Images/Dark Default Pfp.jpeg" style="width:30px;height:30px;border-radius:50%;margin:0 5px;"/>
-                                <span class="text-start ms-xl-2">
-                                    Admin
-                                    <i class="bi bi-chevron-down"></i>
-                                </span>
+    <div id="content">
+        @if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(Context.Session.GetString("RefreshToken")))
+        {
+            <nav class="navbar-header navbar navbar-expand-lg navbar-light bg-white border-bottom header-nav-info">
+                <div class="dropdown header-item" style="height: 70px; display: flex; align-items: center;">
+                    <button type="button" class="btn" id="page-header-user-dropdown">
+                        <span class="d-flex align-items-center">
+                            <img alt="Header Avater" src="~/Images/Dark Default Pfp.jpeg" style="width:30px;height:30px;border-radius:50%;margin:0 5px;" />
+                            <span class="text-start ms-xl-2">
+                                @firstName  @lastName 
+                                <i class="bi bi-chevron-down"></i>
                             </span>
-                        </button>
-                    </div>
-                    <div id="profile_menu" class="profile_menu" hidden>
-                        <ul>
-                            <li class="link">
-                                <span>
-                                    <i class="bi bi-person-fill"></i>
-                                    Profile
-                                </span>
-                            </li>
-                            <li class="link">
-                                <span>
-                                    <i class="bi bi-gear"></i>
-                                    Settings
-                                </span>
-                            </li>
-                            <li style="width: 100%; border: 1px solid #f1e8e8bd; margin: 5px 0;"></li>
-                            <li class="link">
-                                <span>
-                                    <i class="bi bi-power"></i>
-                                    Logout
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
-                }
-            <main role="main" class="pb-3" style="padding:0 15px;">
-                @RenderBody()
-            </main>
-        </div>
+                        </span>
+                    </button>
+                </div>
+                <div id="profile_menu" class="profile_menu" hidden>
+                    <ul>
+                        <li class="link">
+                            <span>
+                                <i class="bi bi-person-fill"></i>
+                                Profile
+                            </span>
+                        </li>
+                        <li class="link">
+                            <span>
+                                <i class="bi bi-gear"></i>
+                                Settings
+                            </span>
+                        </li>
+                        <li style="width: 100%; border: 1px solid #f1e8e8bd; margin: 5px 0;"></li>
+                        <li class="link">
+                            <span>
+                                <i class="bi bi-power"></i>
+                                <a href="javascript:void(0);" onclick="logout()" style="color: red; text-decoration: none;">Logout</a>
+
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        }
+        @{ 
+            var paddingStyle = "padding: 0 15px;";
+            if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(Context.Session.GetString("RefreshToken")))
+            {
+                paddingStyle = "padding: 100px 15px 0;";
+            } 
+        }
+        <main role="main" class="pb-3" style="@paddingStyle">
+        
+            @RenderBody()
+        </main>
+    </div>
     
 
         <footer class="border-top footer text-muted">
@@ -109,6 +117,26 @@
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // LOGOUT
+        function logout() {
+            $.ajax({
+                url: '@Url.Action("Logout", "Account")',
+                type: 'POST',
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log('Logout successful:', data);
+                    window.location.href = '@Url.Action("Login", "Account")';
+                    sessionStorage.removeItem('JWTToken');
+                    sessionStorage.removeItem('RefreshToken');
+                },
+                error: function (xhr, status, error) {
+
+                    console.error('Error during logout:', error);
+                }
+            });
+        }
+    </script>
     @if (User.Identity.IsAuthenticated && !string.IsNullOrEmpty(Context.Session.GetString("RefreshToken")))
     {
         <script>
@@ -124,7 +152,7 @@
                             contentType: 'application/json',
 
                             success: function (data) {
-                                debugger
+                                
                                 console.log(data)
                                 if (data) {
                                     sessionStorage.setItem('JWTToken', data.newToken);
@@ -145,27 +173,7 @@
     }
 
 
-    <script>
-    function logout() {
-            $.ajax({
-                url: '@Url.Action("Logout", "Account")',
-                type: 'POST',
-                contentType: 'application/json',
-                success: function (data) {
-                    console.log('Logout successful:', data);
-                    window.location.href = '@Url.Action("Login", "Account")';
-                    sessionStorage.removeItem('JWTToken');
-                    sessionStorage.removeItem('RefreshToken');
-                },
-                error: function (xhr, status, error) {
-
-                    console.error('Error during logout:', error);
-                }
-            });
-        }
-
-
-    </script>
+ 
 
 
 

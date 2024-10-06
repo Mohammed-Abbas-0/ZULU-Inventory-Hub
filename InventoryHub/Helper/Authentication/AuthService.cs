@@ -101,7 +101,9 @@ namespace InventoryHub.Helper.Authentication
                     IsAuthenticated = true,
                     Token = jwt,
                     Username = user.UserName,
-                    UserId = user.Id
+                    UserId = user.Id,
+                    FirstName=user.FirstName,
+                    LastName=user.LastName
                 };
 
                 // التعامل مع الـ RefreshToken
@@ -137,7 +139,9 @@ namespace InventoryHub.Helper.Authentication
                 IsAuthenticated = true,
                 Token = jwtToken,
                 Username = user.UserName,
-                UserId = user.Id
+                UserId = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName
             };
 
             // التعامل مع الـ RefreshToken

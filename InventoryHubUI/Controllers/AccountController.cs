@@ -1,4 +1,5 @@
 ﻿using InventoryHubUI.Services;
+using InventoryHubUI.Services.TokenHeader;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -20,10 +21,12 @@ namespace InventoryHubUI.Controllers
     public class AccountController : Controller
     {
         private readonly HttpClient _httpClient;
+        private readonly IHeaderBearerToken _headerBearerToken;
 
-        public AccountController(HttpClient httpClient)
+        public AccountController(HttpClient httpClient, IHeaderBearerToken headerBearerToken)
         {
             _httpClient = httpClient;
+            _headerBearerToken = headerBearerToken;
         }
 
         #region   LOGIN
@@ -59,6 +62,8 @@ namespace InventoryHubUI.Controllers
                 // إعداد ملفات تعريف الارتباط للمصادقة
                 var claims = new List<Claim>
                 {
+                    new Claim("FirstName", tokenResponse.FirstName),
+                    new Claim("LastName", tokenResponse.LastName),
                     new Claim(ClaimTypes.Name, model.Email),
                     new Claim(ClaimTypes.NameIdentifier, tokenResponse.UserId) // تأكد من حصولك على userId من استجابة API
                 };
@@ -183,7 +188,13 @@ namespace InventoryHubUI.Controllers
 
             var jsonContent = new StringContent(JsonConvert.SerializeObject(refreshTokenRequestModel), Encoding.UTF8, "application/json");
 
+            var tokenHeader = await _headerBearerToken.HeaderTokenRequest();
+            if (string.IsNullOrEmpty(tokenHeader))
+                return RedirectToAction("UnauthorizedAccess", "Account");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenHeader);
+
             var url = $"{API_EndPoint.RefreshTokenENDPoint}";
+
             var response = await _httpClient.PostAsync(url,jsonContent);
             response.EnsureSuccessStatusCode();
             if(response.IsSuccessStatusCode)
@@ -244,6 +255,8 @@ namespace InventoryHubUI.Controllers
     public class TokenResponseModel
     {
         public string UserId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string Token { get; set; }
         public string Message { get; set; }
         public string RefreshToken { get; set; }

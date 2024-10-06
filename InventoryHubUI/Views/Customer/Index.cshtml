@@ -553,7 +553,7 @@
         function Delete(CustomerId) {
             Swal.fire({
                 title: 'Are you sure?',
-                text: "You won't be able to recover this item!",
+                text: "You won't be able to recover this Customer!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -591,14 +591,14 @@
                         }
                     },
                     error: function () {
-                        toastr.error("Failed to delete the item.", 'Error');
+                        toastr.error("Failed to delete the Customer.", 'Error');
                     }
                 });
 
                 // Success confirmation message
                 Swal.fire(
                     'Deleted!',
-                    'The item has been deleted.',
+                    'The Customer has been deleted.',
                     'success'
                 );
             }
